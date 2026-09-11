@@ -133,5 +133,38 @@ WHERE ls.revenue > cs.revenue
 ORDER BY rev_dec_ratio DESC
 LIMIT 5;
 
+-- Q10. Which product category generated the highest total revenue in each branch?
+SELECT *
+FROM
+(
+    SELECT
+        branch,
+        category,
+        SUM(total_amount) AS total_revenue,
+        RANK() OVER (
+            PARTITION BY branch
+            ORDER BY SUM(total_amount) DESC
+        ) AS rank_num
+    FROM walmart
+    GROUP BY branch, category
+) AS ranked
+WHERE rank_num = 1;
+
+--Q11. What is the monthly revenue trend for each branch?
+SELECT
+    branch,
+    YEAR(STR_TO_DATE(`date`, '%d/%m/%y')) AS year,
+    MONTH(STR_TO_DATE(`date`, '%d/%m/%y')) AS month,
+    SUM(total_amount) AS monthly_revenue
+FROM walmart
+GROUP BY
+    branch,
+    YEAR(STR_TO_DATE(`date`, '%d/%m/%y')),
+    MONTH(STR_TO_DATE(`date`, '%d/%m/%y'))
+ORDER BY
+    branch,
+    year,
+    month;
+
 
 
